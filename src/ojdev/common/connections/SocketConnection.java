@@ -26,6 +26,7 @@ public class SocketConnection extends Connection {
 	public void sendMessage(MessageBase message) throws IOException {
 		synchronized (writer) {
 			writer.writeObject(message);
+			writer.flush();
 		}
 	}
 
