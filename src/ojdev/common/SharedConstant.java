@@ -10,7 +10,7 @@ public final class SharedConstant {
 	/**
 	 * Default Connection Port
 	 */
-	public static final int DEFAULT_PORT = 1510;
+	public static final int DEFAULT_PORT = 50662;
 
 	public static final DebugMode DEBUG_MODE = DebugMode.VERBOSE;
 	
