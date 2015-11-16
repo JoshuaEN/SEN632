@@ -124,16 +124,7 @@ public class Moderator {
 			ConnectedClient connectedClient = new ConnectedClient(this, connection, newClientId);
 			addConnectedClient(connectedClient);
 			
-			if(SharedConstant.DEBUG) {
-				System.out.printf("Added Client: %s%n", connectedClient.getClientId());
-			}
-			
-			new Thread(new Runnable() {			
-				@Override
-				public void run() {
-					connectedClient.listen();					
-				}
-			}).start();
+			new Thread(connectedClient).start();
 		}
 	}
 	

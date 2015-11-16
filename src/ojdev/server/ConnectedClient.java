@@ -27,7 +27,7 @@ import ojdev.server.Engagement.WarriorNotReadyException;
 /**
  * This is the link between a Client and the rest of the Server. It handles Client Messages, talking to the Moderator or Engagement when needed.
  */
-public class ConnectedClient implements ojdev.common.message_handlers.ClientMessageHandler, EngagedWarrior {
+public class ConnectedClient implements ojdev.common.message_handlers.ClientMessageHandler, EngagedWarrior, Runnable {
 
 	private final int clientId;
 
@@ -162,6 +162,14 @@ public class ConnectedClient implements ojdev.common.message_handlers.ClientMess
 				safeSendMessage(new InvalidMessage(message, getAllowedContext(), e.getMessage()));
 			}
 		}
+	}
+	
+	/**
+	 * Calls listen.
+	 */
+	@Override
+	public void run() {
+		listen();
 	}
 
 	/**
