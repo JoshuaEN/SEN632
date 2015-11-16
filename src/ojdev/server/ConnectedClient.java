@@ -1,6 +1,8 @@
 package ojdev.server;
 
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,6 +127,18 @@ public class ConnectedClient implements ojdev.common.message_handlers.ClientMess
 				
 				disconnect();
 				break;
+			} catch (EOFException e) {
+				if(SharedConstant.DEBUG) {
+					System.out.println("Connection: NOTICE: EOF received: " + e);
+				}
+				disconnect();
+				break;
+			} catch (SocketException e) {
+				if(connection.isClosed() && e.getMessage().equals("socket closed")) {
+					System.out.println("Connection: NOTICE: Socket Closed: " + e);
+				}
+				disconnect();
+				break;
 			} catch (IOException e) {
 				System.err.println("Connection: FATAL: IO Error receiving message: " + e);
 				
@@ -185,9 +199,14 @@ public class ConnectedClient implements ojdev.common.message_handlers.ClientMess
 			sendMessage(message);
 			return true;
 		} catch (DisconnectedException e) {
-			e.printStackTrace();
+			System.err.println("Connection: WARN: Failed to send message: " + message + " because: " + e);
+			if(SharedConstant.DEBUG && SharedConstant.DEBUG_MODE == DebugMode.VERBOSE) {
+				e.printStackTrace();
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(SharedConstant.DEBUG && SharedConstant.DEBUG_MODE == DebugMode.VERBOSE) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}

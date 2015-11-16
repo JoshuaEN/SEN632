@@ -2,6 +2,7 @@ package ojdev.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,7 @@ import ojdev.common.exceptions.InvalidClientId;
 import ojdev.common.exceptions.WarriorAlreadyEngagedException;
 import ojdev.common.messages.MessageBase;
 import ojdev.common.messages.server.ServerTextMessage;
+import ojdev.common.test.DebugMode;
 import ojdev.server.ConnectedClient.DisconnectedException;
 import ojdev.server.Engagement.WarriorNotReadyException;
 
@@ -77,7 +79,25 @@ public class Moderator {
 		System.out.printf("Maximum Connections: %d%n", getMaxClients());
 		
 		while(serverSocket.isClosed() == false && isStopped() == false) {
-			Connection connection = new SocketConnection(serverSocket.accept());
+			Connection connection;
+			
+			try {
+				connection = new SocketConnection(serverSocket.accept());
+			} catch(SocketException e) {
+				// Since Java sends a generic SocketException if the socket is closed,
+				// we need to check if that was the given message.
+				if(serverSocket.isClosed() && e.getMessage().equals("socket closed")) {
+					
+					if(SharedConstant.DEBUG) {
+						System.out.println("Moderator: NOTICE: Socket Closed: " + e);
+					}
+					
+					stopServer();
+					return;
+				}
+				
+				throw e;
+			}
 			
 			if(SharedConstant.DEBUG) {
 				System.out.printf("Recieved New Connection %s%n", connection);
@@ -93,7 +113,7 @@ public class Moderator {
 			
 			synchronized (serverSocket) {
 				if(getConnectedClientsCount() >= getMaxClients()) {
-					System.out.printf("Moderator: WARN: Rejected Client Connection: Server Capacity of %d reached", getMaxClients());
+					System.err.printf("Moderator: WARN: Rejected Client Connection: Server Capacity of %d reached", getMaxClients());
 					connection.sendMessage(new ServerTextMessage(String.format("Server Capacity of %d reached", getMaxClients())));
 					connection.close();
 					continue;
@@ -188,7 +208,10 @@ public class Moderator {
 			// There is no recovery mechanism in place to rectify such an issue, thus there's nothing the Moderator can do.
 			// Logged because eating exceptions without any reporting is rarely--if every--a good idea.
 			System.err.printf("Moderator: WARN: Failed to send message %s to %s because: %s", message, connectedClient, e.getMessage());
-			e.printStackTrace();
+			
+			if(SharedConstant.DEBUG && SharedConstant.DEBUG_MODE == DebugMode.VERBOSE) {
+				e.printStackTrace();
+			}
 		}
 	}
 
