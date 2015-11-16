@@ -7,7 +7,7 @@ import ojdev.common.messages.MessageBase;
 /**
  * Simple wrapper for Java connections.
  */
-public abstract class Connection {
+public abstract class Connection implements AutoCloseable {
 
 	public abstract void sendMessage(MessageBase message) throws IOException;
 
