@@ -17,4 +17,8 @@ public class InvalidMessageTypeException extends Exception {
 	public InvalidMessageTypeException() {
 		this("Invalid Message Type");
 	}
+
+	public InvalidMessageTypeException(String message, Throwable e) {
+		super(message, e);
+	}
 }

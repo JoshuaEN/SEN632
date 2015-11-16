@@ -38,7 +38,7 @@ public class SocketConnection extends Connection {
 				object = reader.readObject();
 			}
 		} catch (ClassNotFoundException e) {
-			throw new InvalidMessageTypeException(e.getMessage());
+			throw new InvalidMessageTypeException(e.getMessage(), e);
 		}
 		
 		if(object instanceof MessageBase) {
