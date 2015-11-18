@@ -108,7 +108,7 @@ public class Client implements Runnable, ServerMessageHandler {
 		return currentWarrior;
 	}
 
-	public void setCurrentWarrior(WarriorBase currentWarrior) {
+	private void setCurrentWarrior(WarriorBase currentWarrior) {
 		this.currentWarrior = currentWarrior;
 	}
 
