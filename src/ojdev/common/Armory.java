@@ -30,6 +30,9 @@ public class Armory {
 	public static final Action BLOCK_RIGHT = new Action("Block Right", ActionDirection.Right, 0);
 	public static final Action BLOCK_LOW = new Action("Block Low", ActionDirection.Low, 20);
 	
+	public static final Action RETREAT = new Action("Retreat", "Withdraw from the Engagement", ActionDirection.None, 0, 0, 50, true, true);
+	public static final Action DEATH = new Action("Death", "May you rest in peace", ActionDirection.None, 0, 0, -100, true, true);
+	
 	public static final Action INVALID_TEST_ACTION = new Action("Invalid Test Action", ActionDirection.None, -999, -999, -999);
 
 	static {
@@ -48,6 +51,8 @@ public class Armory {
 		tmpActionList.add(BLOCK_RIGHT);
 		tmpActionList.add(BLOCK_LOW);
 		
+		tmpActionList.add(RETREAT);
+		tmpActionList.add(DEATH);
 		
 		if(SharedConstant.DEBUG) {
 			tmpActionList.add(INVALID_TEST_ACTION);

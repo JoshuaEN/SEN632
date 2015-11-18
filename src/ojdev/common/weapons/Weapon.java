@@ -86,7 +86,7 @@ public class Weapon implements Serializable {
 	}
 	
 	public boolean canUseAction(Action action) {
-		return getActions().contains(action);
+		return action.isGeneric() || getActions().contains(action);
 	}
 
 	@Override

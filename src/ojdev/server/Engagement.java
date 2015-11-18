@@ -8,7 +8,6 @@ import ojdev.common.Armory;
 import ojdev.common.SelectedAction;
 import ojdev.common.WarriorCombatResult;
 import ojdev.common.actions.Action;
-import ojdev.common.actions.RetreatAction;
 import ojdev.common.exceptions.InvalidClientId;
 import ojdev.common.warriors.WarriorBase;
 import ojdev.common.weapons.Weapon;
@@ -174,7 +173,7 @@ public class Engagement {
 		TreeMap<Integer, List<Integer>> warriorAttackSpeedGroups = new TreeMap<Integer, List<Integer>>();
 		HashMap<Integer, WarriorNode> warriorNodeMap = new HashMap<Integer, WarriorNode>(selectedWarriorActions.size());
 		
-		boolean retreatFlag = false;
+		boolean endEngagementFlag = false;
 		
 		for(EngagedWarrior engagedWarrior : engagedWarriors) {
 			SelectedAction selectedAction = selectedWarriorActions.get(engagedWarrior.getClientId());
@@ -204,8 +203,8 @@ public class Engagement {
 			/* Use instance of instead of directly comparing class to allow for
 			 * extensions of the RetreatAction to be correctly detected.
 			 */
-			if(retreatFlag == false && chosenAction instanceof RetreatAction) {
-				retreatFlag = true;
+			if(endEngagementFlag == false && chosenAction.isEngagementEnder()) {
+				endEngagementFlag = true;
 			}
 			
 			
@@ -282,7 +281,7 @@ public class Engagement {
 			warrior.notifyEngagementCombatResult(warriorCombatResults);
 		}
 		
-		if(retreatFlag) {
+		if(endEngagementFlag) {
 			endEngagement();
 		}
 	}
