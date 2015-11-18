@@ -3,6 +3,7 @@ package ojdev.common.warriors;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import ojdev.common.Armory;
 import ojdev.common.weapons.Weapon;
@@ -27,6 +28,10 @@ public class Warrior extends WarriorBase {
 	
 	public Warrior(String name, String originLocation, String description, int health) throws UnusableWeaponException {
 		super(name, originLocation, description, health);
+	}
+	
+	public Warrior(Map<String, String> values) throws UnusableWeaponException {
+		super(values);
 	}
 
 	@Override
