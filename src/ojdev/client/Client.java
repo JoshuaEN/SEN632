@@ -195,7 +195,8 @@ public class Client implements Runnable, ServerMessageHandler {
 			return true;
 		}
 		
-		if(comparePoint.before(prospect.getCreatedAt())) {
+		// If the dates are the same, defer to the order they were received (last received = newest)
+		if(prospect.getCreatedAt().before(comparePoint) == false) {
 			return true;
 		}
 		
