@@ -103,6 +103,7 @@ public class Armory {
 		List<Weapon> tmpWeaponList = new ArrayList<Weapon>();
 		
 		tmpWeaponList.add(NO_WEAPON);
+		
 		tmpWeaponList.add(GREAT_SWORD);
 		tmpWeaponList.add(SWORD);
 		
