@@ -51,6 +51,28 @@ public abstract class WarriorBase implements java.io.Serializable {
 	}
 
 	public void setHealth(int health) {
+		setHealth(health, false);
+	}
+	
+	/**
+	 * Sets the Warrior's health
+	 * @param health the health of the warrior
+	 * @param autoAdjust determines if illegal health values (h < 0 or h > 100) should be automatically adjusted to be legal
+	 */
+	public void setHealth(int health, boolean autoAdjust) {
+		if(health > 100) {
+			if(autoAdjust) {
+				health = 100;
+			} else {
+				throw new IllegalArgumentException("Health can't be over 100");
+			}
+		} else if(health < 0) {
+			if(autoAdjust) {
+				health = 0;
+			} else {
+				throw new IllegalArgumentException("Health can't lower than 0");
+			}
+		}
 		this.health = health;
 	}
 
