@@ -111,6 +111,16 @@ public class Armory {
 		}
 		WEAPONS = Collections.unmodifiableList(tmpWeaponList);
 	}
+
+	public static Weapon getWeaponFromName(String name) {
+		for(Weapon weapon : WEAPONS) {
+			if(weapon.getName().equals(name)) {
+				return weapon;
+			}
+		}
+
+		return null;
+	}
 	
 	private static void checkForDuplicateWeapons(List<Weapon> list){
 		Set<String> set = new HashSet<String>(list.size());
