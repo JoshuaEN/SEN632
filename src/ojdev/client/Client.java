@@ -230,6 +230,12 @@ public class Client implements Runnable, ServerMessageHandler {
 	private void nullEngagementCurrentlySelectedActions() {
 		engagementCurrentlySelectedActions = null;
 	}
+	
+	public boolean isInEngagement() {
+		return engagementCurrentlySelectedActions != null &&
+				engagementParticipantClientIds != null &&
+				engagementStartedBy != null;
+	}
 
 	public void sendMessage(MessageBase message) throws IOException {
 		connection.sendMessage(message);
