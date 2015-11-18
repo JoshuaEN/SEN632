@@ -126,6 +126,14 @@ public abstract class WarriorBase implements java.io.Serializable {
 	public abstract String getFileExtension();
 	
 	public abstract List<Weapon> getUsableWeapons();
+	
+	public boolean isDead() {
+		return !isAlive();
+	}
+	
+	public boolean isAlive() {
+		return health > 0;
+	}
 
 	@Override
 	public int hashCode() {
