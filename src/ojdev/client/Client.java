@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import ojdev.common.exceptions.InvalidMessageTypeException;
 import ojdev.common.message_handlers.ServerMessageHandler;
 import ojdev.common.messages.InvalidMessage;
 import ojdev.common.messages.MessageBase;
+import ojdev.common.messages.client.SetWarriorMessage;
 import ojdev.common.messages.server.*;
 import ojdev.common.warriors.WarriorBase;
 import ojdev.common.ConnectedClientState;
@@ -137,7 +139,8 @@ public class Client implements Runnable, ServerMessageHandler {
 	}
 
 	private void setConnectedClients(List<ConnectedClientState> newConnectedClientsList) {
-		Set<Integer> existingRemovedClients = getConnectedClientsMap().keySet();
+		// keySet returns an unmodifiable Set, we need to modify it so we create a new Set based on it
+		Set<Integer> existingRemovedClients = new HashSet<Integer>(getConnectedClientsMap().keySet());
 		
 		for(ConnectedClientState connectedClientState : newConnectedClientsList) {
 			ConnectedClientState currentConnectedClientState = getConnectedClientById(connectedClientState.getClientId());
