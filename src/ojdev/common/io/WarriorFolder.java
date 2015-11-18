@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import ojdev.common.warriors.WarriorBase;
+import ojdev.common.warriors.WarriorBase.UnusableWeaponException;
 
 /**
  * Simple helper class for loading, saving, and listing Warriors.
@@ -58,30 +60,24 @@ public class WarriorFolder {
 		return pathToDirectory.resolve(warriorFileName).toFile();
 	}
 	
-	public WarriorBase loadWarrior(String warriorFileName) throws IOException, ClassNotFoundException {
-		LookAheadObjectInputStream ois = null;
+	public WarriorBase loadWarrior(String warriorFileName) throws IOException, ClassNotFoundException, InvocationTargetException, UnusableWeaponException {
 		WarriorBase warrior;
-		try {
-			ois = new LookAheadObjectInputStream(new FileInputStream(getFileForWarrior(warriorFileName)));
-			warrior = (WarriorBase)ois.readObject();
-		} finally {
-			if(ois != null) {
-				ois.close();
-			}
+		try (
+				FileInputStream fis = 
+					new FileInputStream(getFileForWarrior(warriorFileName));
+		){
+			warrior = WarriorBase.readFromOutputStream(fis);
 		}
 		
 		return warrior;
 	}
 	
 	public void saveWarrior(WarriorBase warrior) throws IOException {
-		ObjectOutputStream oos = null;
-		try {
-			oos = new ObjectOutputStream(new FileOutputStream(getFileForWarrior(warrior), false));
-			oos.writeObject(warrior);
-		} finally {	
-			if(oos != null) {
-				oos.close();
-			}
+		
+		try (
+			FileOutputStream fos = new FileOutputStream(getFileForWarrior(warrior), false);
+		){
+			warrior.writeToOutputStream(fos);
 		}
 	}
 }
