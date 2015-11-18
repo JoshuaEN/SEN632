@@ -298,7 +298,7 @@ public class ConnectedClient implements ojdev.common.message_handlers.ClientMess
 		for(WarriorCombatResult warriorCombatResult : warriorCombatResults) {
 			if(warriorCombatResult.getClientId() == getClientId()) {
 				
-				getWarrior().setHealth(getWarrior().getHealth() - warriorCombatResult.getHealthLost());
+				getWarrior().setHealth(getWarrior().getHealth() - warriorCombatResult.getHealthLost(), true);
 				
 				getModerator().sendMessageToAll(new ClientStateChangedMessage(toConnectedClientState()));
 				
