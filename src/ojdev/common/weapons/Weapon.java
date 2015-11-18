@@ -151,7 +151,7 @@ public class Weapon implements Serializable {
 	public String toString() {
 		return String.format(
 				"Weapon[getName()=%s, getDescription()=%s, getAttackPower()=%s, getAttackSpeed()=%s, getDefensePower()=%s, getActions()=%s]",
-				getDescription(), getName(), getAttackPower(), getAttackSpeed(), getDefensePower(), getActions());
+				getName(), getDescription(), getAttackPower(), getAttackSpeed(), getDefensePower(), getActions());
 	}
 
 }
