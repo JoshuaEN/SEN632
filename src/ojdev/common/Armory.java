@@ -2,7 +2,10 @@ package ojdev.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import ojdev.common.actions.Action;
 import ojdev.common.actions.ActionDirection;
 import ojdev.common.weapons.Weapon;
@@ -50,7 +53,9 @@ public class Armory {
 			tmpActionList.add(INVALID_TEST_ACTION);
 		}
 		
-		
+		if(SharedConstant.DEBUG) {
+			checkForDuplicateActions(tmpActionList);
+		}
 		ACTIONS = Collections.unmodifiableList(tmpActionList);
 	}
 	
@@ -101,6 +106,29 @@ public class Armory {
 		tmpWeaponList.add(GREAT_SWORD);
 		tmpWeaponList.add(SWORD);
 		
+		if(SharedConstant.DEBUG) {
+			checkForDuplicateWeapons(tmpWeaponList);
+		}
 		WEAPONS = Collections.unmodifiableList(tmpWeaponList);
+	}
+	
+	private static void checkForDuplicateWeapons(List<Weapon> list){
+		Set<String> set = new HashSet<String>(list.size());
+		
+		for(Weapon weapon : list) {
+			if(set.add(weapon.getName()) == false) {
+				throw new IllegalArgumentException("Weapon List Contains Duplicate Names!");
+			}
+		}
+	}
+	
+	private static void checkForDuplicateActions(List<Action> list){
+		Set<String> set = new HashSet<String>(list.size());
+		
+		for(Action action : list) {
+			if(set.add(action.getName()) == false) {
+				throw new IllegalArgumentException("Action List Contains Duplicate Names!");
+			}
+		}
 	}
 }
