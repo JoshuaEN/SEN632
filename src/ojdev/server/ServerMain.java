@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import ojdev.common.SharedConstant;
 
@@ -127,6 +130,12 @@ public class ServerMain {
 		
 		scanner.close();
 		
+		ExecutorService service = Executors.newFixedThreadPool(1);
+		
+		service.submit(moderator);
+		
+		service.shutdown();
+
 		try {
 			moderator.stopServer();
 		} catch (IOException e) {
@@ -136,7 +145,12 @@ public class ServerMain {
 			return;
 		}
 		
-		System.exit(0);
+		try {
+			service.awaitTermination(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// no cares
+		}
+		
 		return;
 	}
 
