@@ -1,0 +1,6 @@
+ type=ojdev.common.warriors.Warrior
+ name=Digger
+ origin=
+ description=
+ health=100
+ weapon=Dory

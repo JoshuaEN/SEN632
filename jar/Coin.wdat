@@ -1,0 +1,6 @@
+ type=ojdev.common.warriors.Warrior
+ name=Coin
+ origin=
+ description=
+ health=100
+ weapon=Quarterstaff

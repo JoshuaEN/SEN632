@@ -1,0 +1,6 @@
+ type=ojdev.common.warriors.Warrior
+ name=Bob
+ origin=
+ description=
+ health=100
+ weapon=Bidenhänder
