@@ -185,9 +185,8 @@ public class Weapon implements Serializable {
 					getAttackPower(), 
 					action.getAttackPowerModifier(), 
 					action.getStance(), 
-					action.getDamageType(), 
 					action.isGeneric()
-			);
+			) + getDamageTypeModifier(action.getDamageType());
 		}
 	}
 	
@@ -196,7 +195,6 @@ public class Weapon implements Serializable {
 				getAttackSpeed(), 
 				action.getAttackSpeedModifier(), 
 				action.getStance(), 
-				action.getDamageType(), 
 				action.isGeneric()
 		);
 	}
@@ -206,7 +204,6 @@ public class Weapon implements Serializable {
 				getDefensePower(), 
 				action.getDefensePowerModifier(), 
 				action.getStance(), 
-				action.getDamageType(), 
 				action.isGeneric()
 		);
 	}
@@ -214,8 +211,7 @@ public class Weapon implements Serializable {
 	protected int getEffectiveValue(
 			int base, 
 			int actionMod, 
-			ActionStance stance, 
-			ActionDamageType actionDamageType, 
+			ActionStance stance,
 			boolean isGeneric
 	) {
 		if(isGeneric) {
@@ -226,7 +222,7 @@ public class Weapon implements Serializable {
 			return 0;
 		}
 		
-		return base + actionMod + getDamageTypeModifier(actionDamageType);		
+		return base + actionMod;		
 	}
 	
 	public int getDamageTypeModifier(ActionDamageType actionDamageType) {
