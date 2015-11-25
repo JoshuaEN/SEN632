@@ -231,6 +231,10 @@ public class Client implements Runnable, ServerMessageHandler {
 		engagementCurrentlySelectedActions = new HashMap<Integer, SelectedAction>();
 	}
 	
+	private void clearEngagementCurrentlySelectedActions() {
+		engagementCurrentlySelectedActions.clear();
+	}
+	
 	private void nullEngagementCurrentlySelectedActions() {
 		engagementCurrentlySelectedActions = null;
 	}
@@ -239,6 +243,24 @@ public class Client implements Runnable, ServerMessageHandler {
 		return engagementCurrentlySelectedActions != null &&
 				engagementParticipantClientIds != null &&
 				engagementStartedBy != null;
+	}
+	
+	public boolean isActionSelected() {
+		if(engagementCurrentlySelectedActions == null) {
+			return false;
+		}
+		
+		for(Entry<Integer, SelectedAction> entry : engagementCurrentlySelectedActions.entrySet()) {
+			if(entry.getKey() == getClientId()) {
+				if(entry.getValue() == null) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	public void sendMessage(MessageBase message) throws IOException {
