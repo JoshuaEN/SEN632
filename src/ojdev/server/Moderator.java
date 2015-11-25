@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -26,7 +27,7 @@ import ojdev.server.Engagement.WarriorNotReadyException;
 /**
  * The coordinator and mediator for all ConnectedClients.
  */
-public class Moderator {
+public class Moderator implements Callable<Void> {
 
 	private final ConcurrentHashMap<Integer, ConnectedClient> connectedClients = new ConcurrentHashMap<Integer, ConnectedClient>();
 
@@ -65,6 +66,12 @@ public class Moderator {
 	
 	public int getMaxClients() {
 		return maxClients;
+	}
+	
+	@Override
+	public Void call() throws Exception {
+		startServer();
+		return null;
 	}
 
 	/**
