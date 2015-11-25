@@ -530,12 +530,12 @@ public class MainWindow
 
 	@Override
 	public void handleSetClientIdMessage(SetClientIdMessage message) {
-		chatAreaTournament.appendText("Tournament Orginizers have assigned you the Master Identifier of %d%n", message.getClientId());
+		chatAreaTournament.appendText("Tournament Organizers have assigned you the Master Identifier of %d%n", message.getClientId());
 	}
 
 	@Override
 	public void handleConnectedClientsListMessage(ConnectedClientsListMessage message) {
-		chatAreaTournament.appendText("Recieved a fresh list of participating Masters from the Tournament Orginizers%n");
+		chatAreaTournament.appendText("Received a fresh list of participating Masters from the Tournament Organizers%n");
 		for(ConnectedClientState state : message.getWarriors()) {
 			updateMasterListRow(state.getClientId());
 		}
@@ -608,7 +608,7 @@ public class MainWindow
 		if(engagedWarrior != null) {
 			engagedWarrior.setSelectedAction(message.getSelectedAction());
 		} else {
-			chatAreaConsole.appendText("Recieved Action Selected Message regarding %d, who we do not appear to be engaged with at present", message.getSelectedAction().getClientId());
+			chatAreaConsole.appendText("Received Action Selected Message regarding %d, who we do not appear to be engaged with at present", message.getSelectedAction().getClientId());
 		}
 		updateEngagementState();
 	}
@@ -634,7 +634,7 @@ public class MainWindow
 			if(currentWarrior != null && 
 					client.getCurrentWarrior() != null && 
 					currentWarrior.getName().equals(client.getCurrentWarrior()) == false) {
-				chatAreaTournament.appendText("The Tournament Orginizers welcome your %s, %s, to the field of battle %n", client.getCurrentWarrior().getTypeName(), client.getCurrentWarrior().getName());
+				chatAreaTournament.appendText("The Tournament Organizers welcome your %s, %s, to the field of battle %n", client.getCurrentWarrior().getTypeName(), client.getCurrentWarrior().getName());
 			}
 			
 			updateCurrentWarrior(client.getCurrentWarrior());
@@ -654,7 +654,6 @@ public class MainWindow
 
 	@Override
 	public void handleRelayedTextToAllMessage(RelayedTextToAllMessage message) {
-		// TODO Auto-generated method stub
 		
 		if(message.getSenderClientId() == client.getClientId()) {
 			return;
@@ -1429,7 +1428,7 @@ public class MainWindow
 			updateCurrentWarrior(warrior);
 			updateCurrentWarriorToServer(warrior);
 		} catch (UnusableWeaponException e) {
-			assert false : "Weapon should never be unuseable";
+			assert false : "Weapon should never be unusable";
 			JOptionPane.showMessageDialog(MainWindow.this, "Failed to defy death because the Warrior was unable to break a bone off to use as a weapon: " + e, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
