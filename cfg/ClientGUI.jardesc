@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="SEN632/jar/client_gui.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/SEN632/cfg/ClientGUI.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" mainClassHandleIdentifier="=SEN632/src&lt;ojdev.client.ui.gui{MainWindow.java[MainWindow" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.exceptions"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.messages.client"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.test{DebugMode.java"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.client.ui.gui"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.connections"/>
+        <file path="/SEN632/.gitignore"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.message_handlers"/>
+        <file path="/SEN632/.project"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.messages.server"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.io"/>
+        <file path="/SEN632/README.md"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.warriors"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.messages"/>
+        <file path="/SEN632/.classpath"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.actions"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.client"/>
+        <javaElement handleIdentifier="=SEN632/src&lt;ojdev.common.weapons"/>
+        <javaElement handleIdentifier="=SEN632/&lt;test.output.WarriorFileTest"/>
+    </selectedElements>
+</jardesc>
