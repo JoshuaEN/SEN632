@@ -981,13 +981,19 @@ public class MainWindow
 					throw e.getCause();
 				}
 			} catch (CryptoKeyProblemUnlockException e) {
-				String key = JOptionPane.showInputDialog(this, "Crypto Key Required", e.getMessage(), JOptionPane.INFORMATION_MESSAGE);
+
+				JPasswordField passwordField = new JPasswordField();
+				Object[] promptFields = {"Crypto Key Required", passwordField};
 				
-				if(key == null) {
+				int result = JOptionPane.showOptionDialog(this, promptFields, e.getMessage(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+				
+				//String key = JOptionPane.showInputDialog(this, "Crypto Key Required", e.getMessage(), JOptionPane.INFORMATION_MESSAGE);
+				
+				if(JOptionPane.OK_OPTION != result) {
 					return null;
 				}
 				
-				params.put("unlockKey", key);
+				params.put("unlockKey", new String(passwordField.getPassword()));
 				continue;
 			} catch (Throwable e) {
 				if(e instanceof Exception) {
