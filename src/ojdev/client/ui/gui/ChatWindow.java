@@ -100,7 +100,7 @@ public class ChatWindow extends JFrame implements ChatAreaNotifyInterface {
 			return;
 		}
 		
-		chatArea.closed();
+		chatArea.setClosed(true);
 		setTitle("(Closed) " + getTitle());
 	}
 

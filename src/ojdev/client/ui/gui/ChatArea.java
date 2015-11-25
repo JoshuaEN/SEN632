@@ -86,10 +86,10 @@ public class ChatArea extends JPanel {
 		textArea.append(String.format(text, args));
 	}
 	
-	public void closed() {
-		closed = true;
+	public void setClosed(boolean closed) {
+		this.closed = closed;
 		
-		textField.setEnabled(false);
+		textField.setEnabled(!closed);
 	}
 
 	public boolean isClosed() {
