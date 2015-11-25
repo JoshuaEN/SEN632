@@ -311,6 +311,6 @@ public class Client implements Runnable, ServerMessageHandler {
 
 	@Override
 	public void handleRelayedTextToAllMessage(RelayedTextToAllMessage message) {
-		// NOOP
+		clearEngagementCurrentlySelectedActions();
 	}
 }
