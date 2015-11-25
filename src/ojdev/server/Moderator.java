@@ -135,6 +135,9 @@ public class Moderator {
 	 * @throws IOException if an error occurs in the underlying connection when closing it
 	 */
 	public void stopServer() throws IOException {
+		if(isStopped())
+			return;
+		
 		shutdownLock.writeLock().lock();
 		try {
 			if(isStopped())
