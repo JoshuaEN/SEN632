@@ -109,6 +109,7 @@ public class LookAheadObjectInputStream extends ObjectInputStream
 		tempAllowedTypeList.add(Date.class);
 		tempAllowedTypeList.add(String.class);
 		tempAllowedTypeList.add(Integer.class);
+		tempAllowedTypeList.add(int.class);
 		tempAllowedTypeList.add(Boolean.class);
 		tempAllowedTypeList.add(Number.class);
 		
