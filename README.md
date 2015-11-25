@@ -11,8 +11,11 @@ This continues until one of the Masters withdraws.
 ## Quick Start
 
 1. Download the jar\server.jar and jar\client_gui.jar, and optionally the jar\server_win.bat
-2. Start the server.
-3. Start the client.
+2. Start the server, either by running the runnable server.jar, running the server_win.bat, or running server.jar via java -jar server.jar command. 
+
+  The latter two are equivalent on windows, the bat file is just a shortcut for having to manually run it as a jar.
+  Running it via -jar is desirably as simply running the jar will run it in the background and not display console output.
+3. Start the client by running client_gui.jar.
   4. Connect to the server you started--the default settings should work fine.
   5. Go to the Warriors tab and either select an existing warrior, by clicking the Warrior and clicking the `Use` button, or create a new Warrior to use.
 6. Start another client so you have someone to enter an engagement with, and repeat the above step for that client.
