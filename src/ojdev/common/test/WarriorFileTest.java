@@ -12,8 +12,8 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ojdev.client.WarriorFolder;
 import ojdev.common.Armory;
-import ojdev.common.io.WarriorFolder;
 import ojdev.common.warriors.Warrior;
 import ojdev.common.warriors.WarriorBase;
 
