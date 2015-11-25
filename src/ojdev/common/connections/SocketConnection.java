@@ -27,6 +27,10 @@ public class SocketConnection extends Connection {
 		synchronized (writer) {
 			writer.writeObject(message);
 			writer.flush();
+			
+			// The ObjectStream caches objects and, for whatever reason, doesn't feel the need to maybe check if they
+			// have changed after being cached, so we need to manually tell it to clear its' cache after each send.
+			writer.reset();
 		}
 	}
 
