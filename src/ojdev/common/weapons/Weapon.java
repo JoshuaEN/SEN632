@@ -246,7 +246,10 @@ public class Weapon implements Serializable {
 	}
 
 	public List<Action> getActions() {
-		return Collections.unmodifiableList(actions);
+		List<Action> tmpList = new ArrayList<Action>(actions);
+		tmpList.addAll(Armory.GENERIC_ACTIONS);
+		
+		return Collections.unmodifiableList(tmpList);
 	}
 	
 	public boolean canUseAction(Action action) {
