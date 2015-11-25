@@ -12,7 +12,11 @@ public class Warrior extends WarriorBase {
 
 	private static final long serialVersionUID = 1814946151379871816L;
 	
-	private static final List<Weapon> USEABLE_WEAPONS;
+	public static final String TYPE_NAME = "Warrior";
+	
+	public static final String FILE_EXTENSION = "wdat";
+	
+	public static final List<Weapon> USEABLE_WEAPONS;
 	
 	static {
 		List<Weapon> tempUsableWeapons = new ArrayList<Weapon>();
@@ -33,10 +37,15 @@ public class Warrior extends WarriorBase {
 	public Warrior(Map<String, String> values) throws UnusableWeaponException {
 		super(values);
 	}
+	
+	@Override
+	public String getTypeName() {
+		return TYPE_NAME;
+	}
 
 	@Override
 	public String getFileExtension() {
-		return "wdat";
+		return FILE_EXTENSION;
 	}
 
 	@Override

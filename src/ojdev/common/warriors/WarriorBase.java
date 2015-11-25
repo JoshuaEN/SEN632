@@ -2,8 +2,8 @@ package ojdev.common.warriors;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.AbstractMap;
 import java.lang.reflect.InvocationTargetException;
+import java.util.AbstractMap;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +22,10 @@ import ojdev.common.weapons.WeaponDamageType;
 public abstract class WarriorBase implements java.io.Serializable {
 
 	private static final long serialVersionUID = 2513148787247654417L;
+	
+	public static final String TYPE_NAME = "Warrior";
+	
+	public static final String FILE_EXTENSION = "wdat";
 	
 	public static final String NAME_REGEX = "^[\\w]+$";
 
@@ -59,6 +63,8 @@ public abstract class WarriorBase implements java.io.Serializable {
 			parseEquippedWeapon(values)
 		);
 	}
+	
+	public abstract String getTypeName();
 
 	public String getName() {
 		return name;
