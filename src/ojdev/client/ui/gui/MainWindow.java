@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
@@ -30,6 +31,7 @@ import ojdev.common.exceptions.CryptoKeyProblemUnlockException;
 import ojdev.common.message_handlers.ServerMessageHandler;
 import ojdev.common.messages.InvalidMessage;
 import ojdev.common.messages.client.GetConnectedClientsListMessage;
+import ojdev.common.messages.client.SendTextToAllMessage;
 import ojdev.common.messages.client.SetWarriorMessage;
 import ojdev.common.messages.client.TakeActionMessage;
 import ojdev.common.messages.server.ClientConnectedMessage;
