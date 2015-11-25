@@ -25,7 +25,7 @@ public class SetWarriorMessageTest extends ClientMessageHandlerTest {
 	 */
 	@Test
 	public void testValidMessage() throws Exception {
-		Warrior warrior = new Warrior("Test Warrior", "Someplace", "Something", 100, Armory.GREAT_SWORD);
+		Warrior warrior = new Warrior("Test_Warrior", "Someplace", "Something", 100, Armory.GREAT_SWORD);
 		getConnectionA().sendMessage(new SetWarriorMessage(warrior));
 		
 		int clientIdOfA = getConnectionAQuery().getClientId();
@@ -61,7 +61,7 @@ public class SetWarriorMessageTest extends ClientMessageHandlerTest {
 	public void testDisallowedSetContext() throws Exception {
 		
 		// Set Player's Warriors, since each player must have a Warrior to engage in combat.
-		Warrior warrior = new Warrior("Test Warrior", "Someplace", "Something", 100, Armory.GREAT_SWORD);
+		Warrior warrior = new Warrior("Test_Warrior", "Someplace", "Something", 100, Armory.GREAT_SWORD);
 		warrior.setEquippedWeapon(Armory.GREAT_SWORD);
 		
 		SetWarriorMessage setWarriorMessage = new SetWarriorMessage(warrior);

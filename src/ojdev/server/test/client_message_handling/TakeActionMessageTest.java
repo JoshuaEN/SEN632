@@ -13,11 +13,12 @@ import ojdev.common.warriors.Warrior;
 
 public class TakeActionMessageTest extends ClientMessageHandlerTest {
 
+	@SuppressWarnings("unused")
 	@Test
 	public void testValidMessageChain() throws Exception {
 		
 		// Set Player's Warriors, since each player must have a Warrior to engage in combat.
-		Warrior warrior = new Warrior("Test Warrior", "Someplace", "Something", 100, Armory.GREAT_SWORD);
+		Warrior warrior = new Warrior("Test_Warrior", "Someplace", "Something", 100, Armory.GREAT_SWORD);
 		warrior.setEquippedWeapon(Armory.GREAT_SWORD);
 
 		SetWarriorMessage setWarriorMessage = new SetWarriorMessage(warrior);

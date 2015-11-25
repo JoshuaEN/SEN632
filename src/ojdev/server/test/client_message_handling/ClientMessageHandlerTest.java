@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -27,7 +29,7 @@ public class ClientMessageHandlerTest {
 	public Timeout globalTimeout = new Timeout(10, TimeUnit.SECONDS);
 	
 	private Moderator server;
-	private Thread serverThread;
+	private ExecutorService service;
 	private Connection connectionA;
 	private Connection connectionB;
 	private ConnectionQuery connectionAQuery;
@@ -68,19 +70,11 @@ public class ClientMessageHandlerTest {
 	@Before
 	public void setUp() throws Exception {
 		this.server = new Moderator(20, ServerTestConstant.DEFAULT_PORT, 20);
-		this.serverThread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					server.startServer();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-		this.serverThread.start();
+		
+		service = Executors.newSingleThreadExecutor();
+		service.submit(server);
+		service.shutdown();
+
 		this.connectionA = new SocketConnection(new Socket("localhost", ServerTestConstant.DEFAULT_PORT));
 		this.connectionAQuery = new ConnectionQuery(this.connectionA);
 		this.connectionB = new SocketConnection(new Socket("localhost", ServerTestConstant.DEFAULT_PORT));
@@ -93,7 +87,7 @@ public class ClientMessageHandlerTest {
 		this.connectionB.close();
 		this.server.stopServer();
 		this.server = null;
-		this.serverThread = null;
+		service.awaitTermination(100, TimeUnit.MILLISECONDS);
 		this.connectionA = null;
 		this.connectionB = null;	 
 	}

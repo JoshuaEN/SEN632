@@ -11,15 +11,16 @@ public class GetConnectedClientsListMessageTest extends ClientMessageHandlerTest
 
 	@Test
 	public void testValidMessage() throws Exception {
-		getConnectionA().sendMessage(new GetConnectedClientsListMessage());
+		getConnectionB().sendMessage(new GetConnectedClientsListMessage());
 		
 		ConnectedClientsListMessage connectedClientsListMessage = 
-				getConnectionAQuery().getMessageOf(ConnectedClientsListMessage.class);
+				getConnectionBQuery().getMessageOf(ConnectedClientsListMessage.class);
 		
 		assertConnectionListsMatch(connectedClientsListMessage);
 		
 		getConnectionB().close();
 		
+		getConnectionA().sendMessage(new GetConnectedClientsListMessage());
 		connectedClientsListMessage = 
 				getConnectionAQuery().getMessageOf(ConnectedClientsListMessage.class);
 		
