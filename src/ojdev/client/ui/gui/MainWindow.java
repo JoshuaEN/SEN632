@@ -469,7 +469,8 @@ public class MainWindow
 		tabbedPaneChat.setBorder(null);
 		splitPane.setRightComponent(tabbedPaneChat);
 		
-		chatAreaTournament = new ChatArea(null);
+		chatAreaTournament = new ChatArea(this);
+		chatAreaTournament.setClosed(true);
 		tabbedPaneChat.add("Tournament", chatAreaTournament);
 
 		chatAreaEngagement = new ChatArea(null);
@@ -653,6 +654,21 @@ public class MainWindow
 	public void handleRelayedTextToAllMessage(RelayedTextToAllMessage message) {
 		// TODO Auto-generated method stub
 		
+		if(message.getSenderClientId() == client.getClientId()) {
+			return;
+		}
+		
+		String name;
+		
+		ConnectedClientState state = client.getConnectedClientById(message.getSenderClientId());
+		
+		if(state != null) {
+			name = ClientFormatHelper.getMasterNameFromState(state, false);
+		} else {
+			name = ((Integer)message.getSenderClientId()).toString();
+		}
+		
+		chatAreaTournament.appendText("%s > %s%n", name, message.getMessage());
 	}
 	
 	@Override
@@ -691,6 +707,16 @@ public class MainWindow
 
 	@Override
 	public boolean notifyTextEntered(ChatArea source, String text) {
+		
+		if(source == chatAreaTournament && client != null) {
+			try {
+				client.sendMessage(new SendTextToAllMessage(text));
+			} catch (IOException e) {
+				source.appendText("Failed to send message: %s", e);
+				return false;
+			}
+		}
+		
 		return true;
 	}
 	
@@ -723,6 +749,7 @@ public class MainWindow
 			updateCurrentWarriorToServer(currentWarrior);
 		}
 		updateServerConnectionRelatedState();
+		chatAreaTournament.setClosed(false);
 	}
 	
 	private void leaveTournament() {
@@ -748,6 +775,7 @@ public class MainWindow
 		clearPrivateChats();
 		updateEngagementState();
 		updateServerConnectionRelatedState();
+		chatAreaTournament.setClosed(true);
 	}
 	
 	private void requestMasterList() {
