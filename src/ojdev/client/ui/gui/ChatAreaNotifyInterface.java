@@ -8,4 +8,6 @@ public interface ChatAreaNotifyInterface {
 	 * @return boolean indicating if the text entered was successfully processed
 	 */
 	public boolean notifyTextEntered(ChatArea source, String text);
+	
+	public String getChatDisplayName();
 }

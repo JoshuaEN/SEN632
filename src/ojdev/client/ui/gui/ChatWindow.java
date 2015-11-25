@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import ojdev.client.Client;
+import ojdev.common.ConnectedClientState;
 import ojdev.common.messages.client.SendTextMessage;
 
 @SuppressWarnings("serial")
@@ -82,7 +83,16 @@ public class ChatWindow extends JFrame implements ChatAreaNotifyInterface {
 	}
 
 	public void appendText(Integer from, String text) {
-		chatArea.appendText("%d > %s%n", from, text);		
+		ConnectedClientState state = client.getConnectedClientById(from);
+		
+		String fromStr;
+		
+		if(state != null) {
+			fromStr = ClientFormatHelper.getMasterNameFromState(state, state.getClientId() == from);
+		} else {
+			fromStr = from.toString();
+		}
+		chatArea.appendText("%s > %s%n", fromStr, text);		
 	}
 	
 	public void closed() {
@@ -92,6 +102,17 @@ public class ChatWindow extends JFrame implements ChatAreaNotifyInterface {
 		
 		chatArea.closed();
 		setTitle("(Closed) " + getTitle());
+	}
+
+	@Override
+	public String getChatDisplayName() {
+		ConnectedClientState state = client.getConnectedClientById(client.getClientId());
+		
+		if(state == null) {
+			return ((Integer)client.getClientId()).toString();
+		} else {
+			return ClientFormatHelper.getMasterNameFromState(state, true);
+		}
 	}
 
 }

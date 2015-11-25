@@ -49,6 +49,7 @@ public class ChatArea extends JPanel {
 		}
 		
 		textArea = new JTextArea();
+		textArea.setRequestFocusEnabled(false);
 		textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		textArea.setText("");
 		textArea.setBorder(null);
@@ -75,7 +76,7 @@ public class ChatArea extends JPanel {
 		}
 
 		if(mainWindow.notifyTextEntered(ChatArea.this, e.getActionCommand())) {
-			appendText("> %s%n", e.getActionCommand());
+			appendText("%s > %s%n", (mainWindow != null ? mainWindow.getChatDisplayName() : ""), e.getActionCommand());
 			textField.setText("");
 		}
 	}

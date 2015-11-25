@@ -693,6 +693,17 @@ public class MainWindow
 	public boolean notifyTextEntered(ChatArea source, String text) {
 		return true;
 	}
+	
+	@Override
+	public String getChatDisplayName() {
+		ConnectedClientState state = client.getConnectedClientById(client.getClientId());
+		
+		if(state == null) {
+			return ((Integer)client.getClientId()).toString();
+		} else {
+			return ClientFormatHelper.getMasterNameFromState(state, true);
+		}
+	}
 
 	private void joinTournament() {
 		Connection connection;
