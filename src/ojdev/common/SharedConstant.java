@@ -15,4 +15,7 @@ public final class SharedConstant {
 	public static final DebugMode DEBUG_MODE = DebugMode.VERBOSE;
 	
 	public static final boolean DEBUG = true;
+
+	
+	public static final int UNDEAD_STARTING_HEALTH = 20;
 }

@@ -6,6 +6,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ojdev.common.Armory;
 import ojdev.common.ConnectedClientState;
 import ojdev.common.SelectedAction;
 import ojdev.common.SharedConstant;
@@ -19,7 +20,11 @@ import ojdev.common.messages.*;
 import ojdev.common.messages.client.*;
 import ojdev.common.messages.server.*;
 import ojdev.common.test.DebugMode;
+import ojdev.common.warriors.UndeadWarrior;
+import ojdev.common.warriors.Warrior;
 import ojdev.common.warriors.WarriorBase;
+import ojdev.common.warriors.WarriorBase.UnusableWeaponException;
+import ojdev.common.weapons.Weapon;
 import ojdev.server.Engagement.InvalidActionSelectionException;
 import ojdev.server.Engagement.WarriorActionAlreadySelectedException;
 import ojdev.server.Engagement.WarriorNotReadyException;
@@ -223,6 +228,9 @@ public class ConnectedClient implements ojdev.common.message_handlers.ClientMess
 	 * Disconnects the Client and informs the Current Engagement and Moderator.
 	 */
 	public void disconnect() {
+		if(isDisconnected())
+			return;
+		
 		synchronized (connection) {
 			if(isDisconnected())
 				return;
@@ -369,19 +377,38 @@ public class ConnectedClient implements ojdev.common.message_handlers.ClientMess
 
 	@Override
 	public void handleSetWarriorMessage(SetWarriorMessage message) {
+		WarriorBase warrior = message.getWarrior();
+		
 		if(isEngaged()) {
-			safeSendMessage(new InvalidMessage(message, getAllowedContext(), "Warrior cannot be changed while in an Engagement."));
-			return;
-		} else {
-			WarriorBase warrior = message.getWarrior();
 			
-			if(warrior.getUsableWeapons().contains(warrior.getEquippedWeapon()) == false) {
+			if(getWarrior().isDead() && getWarrior() instanceof Warrior == true && message.getWarrior() instanceof UndeadWarrior) {
+				if(warrior.getHealth() != SharedConstant.UNDEAD_STARTING_HEALTH) {
+					safeSendMessage(new InvalidMessage(message, getAllowedContext(), "Undead Warriors created during an Engagement must have " + SharedConstant.UNDEAD_STARTING_HEALTH + " health"));
+					return;
+				}
+			} else {
+				safeSendMessage(new InvalidMessage(message, getAllowedContext(), "Warrior cannot be changed while in an Engagement, except to become Undead."));
+				return;
+			}
+		}
+
+		if(warrior != null) {
+			Weapon locatedWeapon = Armory.getWeaponFromName(warrior.getEquippedWeapon().getName());
+
+			if(locatedWeapon == null) {
+				safeSendMessage(new InvalidMessage(message, getAllowedContext(), "The warrior is wielding an new and unknown weapon, which is not permitted by the Tournament rules"));
+				return;
+			}
+
+			try {
+				warrior.setEquippedWeapon(locatedWeapon);
+			} catch(UnusableWeaponException e) {
 				safeSendMessage(new InvalidMessage(message, getAllowedContext(), "That Warrior can't wield that Weapon"));
 				return;
 			}
-			
-			setWarrior(message.getWarrior());
 		}
+
+		setWarrior(message.getWarrior());
 	}
 
 	@Override
