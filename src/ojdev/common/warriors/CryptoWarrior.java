@@ -73,7 +73,7 @@ public class CryptoWarrior extends WarriorBase {
 	public CryptoWarrior(String name, String originLocation, String description, int health, Weapon equippedWeapon, String password) throws UnusableWeaponException {
 		super(name, originLocation, description, health, equippedWeapon);
 		try {
-			this.keySalt = KeyDeviation.getSalt();
+			this.keySalt = KeyDerivation.getSalt();
 		} catch (NoSuchAlgorithmException e) {
 			throw new CryptoException(e);
 		}
@@ -206,7 +206,7 @@ public class CryptoWarrior extends WarriorBase {
 		SecretKey secretKey;
 		String rawDecryptedValues;
 		try {
-			secretKey = KeyDeviation.generatePasswordHash(unlockKey, unlockKeyIterations, unlockKeySalt);
+			secretKey = KeyDerivation.generatePasswordHash(unlockKey, unlockKeyIterations, unlockKeySalt);
 
 			rawDecryptedValues = EncryptionDecryptionAES.decrypt(lockedContent, secretKey);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
@@ -262,7 +262,7 @@ public class CryptoWarrior extends WarriorBase {
 	private SecretKey getKey(String password) {
 
 		try {
-			return KeyDeviation.generatePasswordHash(password, keyIterations, keySalt);
+			return KeyDerivation.generatePasswordHash(password, keyIterations, keySalt);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new CryptoException(e);
 		}
@@ -307,7 +307,7 @@ class EncryptionDecryptionAES {
 }
 
 // From http://howtodoinjava.com/2013/07/22/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
-class KeyDeviation
+class KeyDerivation
 {	
     static SecretKey generatePasswordHash(String password, int iterations, String saltStr) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
