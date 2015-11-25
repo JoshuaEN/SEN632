@@ -33,20 +33,20 @@ public class Client implements Runnable, ServerMessageHandler {
 	
 	private final ClientUserInterface clientInterface;
 
-	private int currentClientId = -1;
+	private volatile int currentClientId = -1;
 
-	private WarriorBase currentWarrior;
+	private volatile WarriorBase currentWarrior;
 
-	private Map<Integer, ConnectedClientState> connectedClients = new HashMap<Integer, ConnectedClientState>();
+	private volatile Map<Integer, ConnectedClientState> connectedClients = new HashMap<Integer, ConnectedClientState>();
 	
-	private Map<Integer, Date> connectedClientsRemovalList = new HashMap<Integer, Date>();
+	private volatile Map<Integer, Date> connectedClientsRemovalList = new HashMap<Integer, Date>();
 	
-	private Integer engagementStartedBy = null;
+	private volatile Integer engagementStartedBy = null;
 	
-	private List<Integer> engagementParticipantClientIds = null;
+	private volatile List<Integer> engagementParticipantClientIds = null;
 	
-	private Map<Integer, SelectedAction> engagementCurrentlySelectedActions = null;
-	
+	private volatile Map<Integer, SelectedAction> engagementCurrentlySelectedActions = null;
+
 	/**
 	 * @param connection 
 	 * @param serverMessageHandler
