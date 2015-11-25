@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import ojdev.common.connections.Connection;
@@ -16,7 +17,6 @@ import ojdev.common.exceptions.InvalidMessageTypeException;
 import ojdev.common.message_handlers.ServerMessageHandler;
 import ojdev.common.messages.InvalidMessage;
 import ojdev.common.messages.MessageBase;
-import ojdev.common.messages.client.SetWarriorMessage;
 import ojdev.common.messages.server.*;
 import ojdev.common.warriors.WarriorBase;
 import ojdev.common.ConnectedClientState;
@@ -83,21 +83,30 @@ public class Client implements Runnable, ServerMessageHandler {
 		try {
 			listen();
 		} catch (InvalidMessageTypeException | IOException | IllegalMessageContext e) {
-			clientInterface.notifyException(e);
+			notifyException(e);
 		}
 	}
 	
 	public void listen() throws InvalidMessageTypeException, IOException, IllegalMessageContext {
 		while(connection.isClosed() == false) {
 			MessageBase message = connection.receiveMessage();
-			
-			message.handleWith(this);
-			
-			if(serverMessageHandler != null)
-				message.handleWith(serverMessageHandler);
+
+			handleMessage(message);
 		}
 	}
+	
+	protected void handleMessage(MessageBase message) throws IllegalMessageContext {
+		message.handleWith(this);
 
+		if(serverMessageHandler != null) {
+			message.handleWith(serverMessageHandler);
+		}
+	}
+	
+	public Connection getConnection() {
+		return connection;
+	}
+	
 	public int getClientId() {
 		return currentClientId;
 	}
@@ -112,6 +121,20 @@ public class Client implements Runnable, ServerMessageHandler {
 
 	private void setCurrentWarrior(WarriorBase currentWarrior) {
 		this.currentWarrior = currentWarrior;
+		
+		notifyCurrentWarriorChanged(currentWarrior);
+	}
+	
+	protected void notifyCurrentWarriorChanged(WarriorBase currentWarrior) {
+		if(clientInterface != null) {
+			clientInterface.notifyCurrentWarriorChanged(currentWarrior);
+		}
+	}
+	
+	protected void notifyException(Exception e) {
+		if(clientInterface != null) {
+			clientInterface.notifyException(e);
+		}
 	}
 
 	public Map<Integer, ConnectedClientState> getConnectedClientsMap() {
@@ -124,6 +147,14 @@ public class Client implements Runnable, ServerMessageHandler {
 	
 	public ConnectedClientState getConnectedClientById(int clientId) {
 		return connectedClients.get(clientId);
+	}
+	
+	protected ServerMessageHandler getExternalMessageHandler() {
+		return serverMessageHandler;
+	}
+	
+	protected ClientUserInterface getUserInterface() {
+		return clientInterface;
 	}
 	
 	private void setConnectedClientById(int clientId, ConnectedClientState connectedClientState) {
