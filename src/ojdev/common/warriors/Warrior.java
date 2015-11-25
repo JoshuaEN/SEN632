@@ -21,7 +21,11 @@ public class Warrior extends WarriorBase {
 	static {
 		List<Weapon> tempUsableWeapons = new ArrayList<Weapon>();
 		
+		tempUsableWeapons.add(Armory.NO_WEAPON);
 		tempUsableWeapons.add(Armory.GREAT_SWORD);
+		tempUsableWeapons.add(Armory.SWORD);
+		tempUsableWeapons.add(Armory.SPEAR);
+		tempUsableWeapons.add(Armory.STAFF);
 		
 		USEABLE_WEAPONS = Collections.unmodifiableList(tempUsableWeapons);
 	}
