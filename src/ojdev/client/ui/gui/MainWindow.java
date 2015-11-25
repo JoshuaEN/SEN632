@@ -1062,7 +1062,9 @@ public class MainWindow
 		if(warrior == null) {
 			return;
 		} else if(currentWarrior != null && currentWarrior.getName().equals(warrior.getName())) {
-			chatAreaConsole.appendText("Unable to delete the in-use Warrior %s", currentWarrior.getName());
+			JOptionPane.showMessageDialog(this, 
+					"Unable to delete the in-use Warrior, " + currentWarrior.getName(), "Warrior In Use", 
+					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		if(prompt) {
