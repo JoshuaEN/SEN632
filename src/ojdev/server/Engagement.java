@@ -1,13 +1,16 @@
 package ojdev.server;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import ojdev.common.Armory;
 import ojdev.common.SelectedAction;
 import ojdev.common.WarriorCombatResult;
 import ojdev.common.actions.Action;
+import ojdev.common.actions.ActionDamageType;
+import ojdev.common.actions.ActionDirection;
+import ojdev.common.actions.ActionStance;
 import ojdev.common.exceptions.InvalidClientId;
 import ojdev.common.warriors.WarriorBase;
 import ojdev.common.weapons.Weapon;
@@ -15,7 +18,6 @@ import ojdev.common.weapons.Weapon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * Represents a single combat engagement between two, or (in theory) more Warriors. Acts as the Moderator for any Engagement actions (recording actions, calculating combat results, notifying Warriors of interactions). Uses the EngagedWarrior interface to communicate with  the ConnectedCients for the respective Warriors.
@@ -37,6 +39,8 @@ public class Engagement {
 			throw new IllegalArgumentException("An Engagement must involve at least two warriors.");
 		} else if(engagedWarriors.size() > 2) {
 			throw new IllegalArgumentException("Engagements currently do not support more than two warriors.");
+		} else if(engagedWarriors.get(0).getClientId() == engagedWarriors.get(1).getClientId()) {
+			throw new IllegalArgumentException("Engagements must involve at least two DIFFERENT warriors.");
 		}
 
 		
@@ -48,6 +52,10 @@ public class Engagement {
 			
 			if(engagedWarrior.getWarrior().hasNoWeaponEquipped()) {
 				throw new WarriorNotReadyException("Warrior has no Weapon Equipped");
+			}
+			
+			if(engagedWarrior.getWarrior().isDead()) {
+				throw new WarriorNotReadyException("Warrior is dead");
 			}
 		}
 		
@@ -169,113 +177,97 @@ public class Engagement {
 		 *  Pass 1
 		 *  Get effective attack speed and attack/defense power for each Warrior.
 		 */
-		HashMap<Integer, ActionStats> warriorActionStats = new HashMap<Integer, ActionStats>(selectedWarriorActions.size());
-		TreeMap<Integer, List<Integer>> warriorAttackSpeedGroups = new TreeMap<Integer, List<Integer>>();
-		HashMap<Integer, WarriorNode> warriorNodeMap = new HashMap<Integer, WarriorNode>(selectedWarriorActions.size());
+		Map<Integer, ActionStats> warriorActionStats = new HashMap<Integer, ActionStats>(selectedWarriorActions.size());
+		Map<Integer, List<ActionResult>> intermResults = new HashMap<Integer, List<ActionResult>>();
+		Map<Integer, Weapon> weaponUsedById = new HashMap<Integer, Weapon>(selectedWarriorActions.size());
 		
 		boolean endEngagementFlag = false;
 		
-		for(EngagedWarrior engagedWarrior : engagedWarriors) {
+		for(int i = 0; i < engagedWarriors.size(); i++) {
+			EngagedWarrior engagedWarrior = engagedWarriors.get(i);
 			SelectedAction selectedAction = selectedWarriorActions.get(engagedWarrior.getClientId());
 			Weapon chosenWeapon = engagedWarrior.getWarrior().getEquippedWeapon();
 			Action chosenAction = selectedAction.getAction();
 			
 			ActionStats stats;
 			
-			if(chosenWeapon == null) {
-				stats = new ActionStats(0, 0, 0);
+			if(chosenWeapon == null || engagedWarrior.getWarrior().isDead()) {
+				stats = new ActionStats(
+							engagedWarrior.getClientId(), 
+							selectedAction.getTargetClientId(), 
+							engagedWarrior.getWarrior(), chosenWeapon, selectedAction, 
+							0, 0, 0
+						);
 			} else {
 				stats = new ActionStats(
-						chosenWeapon.getEffectiveAttackSpeed(chosenAction), 
-						chosenWeapon.getEffectiveAttackPower(chosenAction), 
-						chosenWeapon.getEffectiveDefensePower(chosenAction)
+						engagedWarrior.getClientId(), 
+						selectedAction.getTargetClientId(), 
+						engagedWarrior.getWarrior(), chosenWeapon, selectedAction
 					);
 			}
 			
-			
-			int attackSpeed = stats.getAttackSpeed();
-
-			if(warriorAttackSpeedGroups.containsKey(attackSpeed) == false) {
-				warriorAttackSpeedGroups.put(attackSpeed, new ArrayList<Integer>());
-			}
-			warriorAttackSpeedGroups.get(attackSpeed).add(engagedWarrior.getClientId());
-			
-			/* Use instance of instead of directly comparing class to allow for
-			 * extensions of the RetreatAction to be correctly detected.
-			 */
-			if(endEngagementFlag == false && chosenAction.isEngagementEnder()) {
+			if(chosenAction.isEngagementEnder()) {
 				endEngagementFlag = true;
 			}
 			
 			
-			warriorActionStats.put(
-				engagedWarrior.getClientId(),
-				stats
-			);
-			
-			warriorNodeMap.put(
-				engagedWarrior.getClientId(),
-				new WarriorNode(engagedWarrior.getClientId(), selectedAction.getTargetClientId(), stats, chosenWeapon, chosenAction)
-			);
+			warriorActionStats.put(stats.getClientId(), stats);
+			intermResults.put(stats.getClientId(), new ArrayList<ActionResult>());
+			weaponUsedById.put(stats.getClientId(), chosenWeapon);
 		}
 		
 		/*
 		 * Pass 2
-		 * Fill the node data in
+		 * 
+		 * Attack Calculations
+		 * 
+		 * For an attack to be successful it:
+		 * * Must not be blocked by the oppoent's defense power being higher than the attacks attack power
+		 * * Must not be interrupted by the oppoent's attack
 		 */
-		for(Entry<Integer, WarriorNode> nodeMapEntry : warriorNodeMap.entrySet()) {
-			WarriorNode currentNode = nodeMapEntry.getValue();
-			WarriorNode oppoentNode = 
-					warriorNodeMap.get(
-							selectedWarriorActions.get(
-									currentNode.getClientId()
-							).getTargetClientId()
-					);
+
+		
+		for(ActionStats stats : warriorActionStats.values()) {
+			ActionResult result = stats.calculateResult(warriorActionStats.get(stats.getTargetClientId()));
 			
-			Edge edge = new Edge(currentNode, oppoentNode);
+			if(result == null) {
+				continue;
+			}
 			
-			currentNode.addCombatEdge(edge);
-			oppoentNode.addCombatEdge(edge);
+			intermResults.get(result.getClientId()).add(result);
 		}
 		
 		/*
 		 * Pass 3
-		 * Generate Result data
 		 * 
-		 * TODO Make this support more than 2 warriors max.
-		 * Right now, having more than two Warriors will "work",
-		 * but it ignores the complex interactions.
-		 * (Each attack is effectively isolated, with only
-		 * the cumulative result of all of the attacks being
-		 * noted).
-		 * 
-		 * E.g. Warrior A successfully attacks Warrior B,
-		 * Warrior B though successfully attacks Warrior C,
-		 * even though had Warrior B attacked Warrior A,
-		 * they wouldn't have been successful because Warrior A's
-		 * attack speed is faster (and thus Warrior B's attack would
-		 * have been interrupted).
-		 * 
-		 * The difficultly with doing so is that there can be cycles, as a result of the rules.
-		 * This significantly complicates the process (Warrior A attacks Warrior B, Warrior B
-		 * attacks Warrior C, Warrior C attacks Warrior A; headache ensues because each
-		 * attack could interrupt another attack, so the big picture must be considered
-		 * rather than simply looking at individual combat between two Warriors).
+		 * Result merging
 		 */
 		List<WarriorCombatResult> warriorCombatResults = new ArrayList<WarriorCombatResult>(engagedWarriors.size());
 		
-		for(Entry<Integer, WarriorNode> warriorNodeEntry : warriorNodeMap.entrySet()) {
-			int clientId = warriorNodeEntry.getKey();
-			WarriorNode warriorNode = warriorNodeEntry.getValue();
+		for(Entry<Integer, List<ActionResult>> entry : intermResults.entrySet()) {
+			int healthLost = 0;
+			HashMap<Integer, Integer> healthLostFrom = new HashMap<Integer, Integer>();
+
+			for(ActionResult result : entry.getValue()) {
+				healthLost += result.getHealthLost();
+				healthLostFrom.put(result.getAttackerClientId(), result.getHealthLost());
+			}
+			
 			warriorCombatResults.add(
-				new WarriorCombatResult(
-						new SelectedAction(clientId, warriorNode.getTargetClientId(), warriorNode.getActionUsed()), 
-						warriorNode.getHealthLost(), 
-						warriorNode.getHealthLostFrom(), 
-						warriorNode.getWeaponUsed()
-				)
+					new WarriorCombatResult(
+							selectedWarriorActions.get(entry.getKey()), 
+							healthLost, 
+							healthLostFrom, 
+							weaponUsedById.get(entry.getKey())
+					)
 			);
 		}
+
+		/*
+		 * Pass 4
+		 * 
+		 * Notify
+		 */
 		
 		for(EngagedWarrior warrior : engagedWarriors) {
 			warrior.notifyEngagementCombatResult(warriorCombatResults);
@@ -284,6 +276,8 @@ public class Engagement {
 		if(endEngagementFlag) {
 			endEngagement();
 		}
+		
+		unreadyAllWarriors();
 	}
 	
 	private synchronized boolean allWarriorsReady() {
@@ -297,7 +291,13 @@ public class Engagement {
 		}
 
 		return true;
-	}	
+	}
+	
+	private synchronized void unreadyAllWarriors() {
+		for(Entry<Integer, SelectedAction> selectedActionSet : selectedWarriorActions.entrySet()) {
+			selectedActionSet.setValue(null);
+		}
+	}
 
 	@Override
 	public String toString() {
@@ -347,14 +347,57 @@ public class Engagement {
 	
 	private class ActionStats
 	{
+		private final int clientId;
+		private final int targetClientId;
+		private final SelectedAction selectedAction;
+		private final Weapon weaponUsed;
+		private final WarriorBase warriorUsed;
 		private final int attackSpeed;
 		private final int attackPower;
 		private final int defensePower;
 		
-		private ActionStats(final int attackSpeed, final int attackPower, final int defensePower) {
+		private ActionStats(final int clientId, final int targetClientId, WarriorBase warriorUsed, Weapon weaponUsed, SelectedAction selectedAction) {
+			this(
+					clientId, 
+					targetClientId, 
+					warriorUsed,
+					weaponUsed, 
+					selectedAction, 
+					weaponUsed.getEffectiveAttackSpeed(selectedAction.getAction()), 
+					weaponUsed.getEffectiveAttackPower(selectedAction.getAction()), 
+					weaponUsed.getEffectiveDefensePower(selectedAction.getAction())
+			);
+		}
+		
+		private ActionStats(final int clientId, final int targetClientId, WarriorBase warriorUsed, Weapon weaponUsed, SelectedAction selectedAction, int attackSpeed, int attackPower, int defensePower) {
+			this.clientId = clientId;
+			this.targetClientId = targetClientId;
+			this.weaponUsed = weaponUsed;
+			this.selectedAction = selectedAction;
+			this.warriorUsed = warriorUsed;
 			this.attackSpeed = attackSpeed;
 			this.attackPower = attackPower;
 			this.defensePower = defensePower;
+		}
+		
+		private int getClientId() {
+			return clientId;
+		}
+		
+		private SelectedAction getSelectedAction() {
+			return selectedAction;
+		}
+		
+		private Weapon getWeaponUsed() {
+			return weaponUsed;
+		}
+		
+		private WarriorBase getWarriorUsed() {
+			return warriorUsed;
+		}
+		
+		private int getTargetClientId() {
+			return targetClientId;
 		}
 
 		private int getAttackSpeed() {
@@ -369,141 +412,118 @@ public class Engagement {
 			return defensePower;
 		}
 		
+		private ActionResult calculateResult(ActionStats target) {
+			
+			Action action = selectedAction.getAction();
+			
+			// Null action or otherwise non-offensive action,
+			// or the warrior is dead and unable to do anything.
+			if(action.getStance() == ActionStance.NONE || 
+				action.getDamageType() == ActionDamageType.NONE ||
+				getWarriorUsed().isDead()) {
+				return null;
+			}
+					
+			// If player isn't attacking, no result to calculate.
+			if(action.getStance() != ActionStance.ATTACK) {
+				return null;
+			}
+			
+			Action targetsAction = target.getSelectedAction().getAction();
+			int possibleDamageToTarget = target.getWarriorUsed().getDamageDone(getWeaponUsed(), action, targetsAction);
+			
+
+			// If client attacked themselves, it's assumed they put up no defense
+			if(targetClientId == clientId) {
+				return new ActionResult(targetClientId, possibleDamageToTarget, clientId);
+			}
+			
+			int possibleDamageFromTarget = getWarriorUsed().getDamageDone(target.getWeaponUsed(), targetsAction, action);
+			int possibleDamageFromTargetCounter = 
+					getWarriorUsed().getDamageDone(
+							target.getWeaponUsed(), 
+							new Action("<SYSTEM> Counter Action", ActionDirection.None, ActionStance.ATTACK, action.getDamageType()), 
+							action
+					);
+			
+			// Targets puts up no defense
+			if(targetsAction.getStance() == ActionStance.NONE || target.getWarriorUsed().isDead()) {
+				return new ActionResult(targetClientId, possibleDamageToTarget, clientId);
+			}
+			
+			// If the Target has a chance at blocking.
+			if(target.getTargetClientId() == clientId) {
+				if (targetsAction.getDirection() == action.getDirection() || 
+						targetsAction.getDirection() == ActionDirection.None)
+				{
+
+					// Attack blocked successfully
+					if(
+							(
+									targetsAction.getStance() == ActionStance.DEFENSE_BLOCK ||
+									targetsAction.getStance() == ActionStance.DEFENSE_COUNTER
+									) && getAttackPower() < target.getDefensePower()
+							) {
+
+						// No counter attack
+						if(targetsAction.getStance() == ActionStance.DEFENSE_BLOCK) {
+							return null;
+
+							// Counter attacked
+						} else {
+							return new ActionResult(clientId, possibleDamageFromTargetCounter, targetClientId);
+						}
+
+						// Attack blocked by both sides attacking the same side,
+						// and having less attack power
+					} else if (
+							target.getTargetClientId() == getClientId() &&
+							targetsAction.getStance() == ActionStance.ATTACK &&
+							getAttackPower() <= target.getAttackPower()
+							) {
+						// The other player's attack will succeed, we don't want to double the damage applied.
+						// Still, we take attrition damage
+						return new ActionResult(clientId, 2, targetClientId);
+					}
+					
+				// If they are targeting us from a different direction, check if they cancel our attack
+				} else if(warriorUsed.isOverPainThreshold(possibleDamageFromTarget)) {
+					// OK, so we both have enough attack to do damage, who is faster though?
+
+					// They hit first, our attack is interrupted and failed
+					if(target.getAttackSpeed() > attackSpeed) {
+						return null;
+					}
+				}
+			}
+
+			return new ActionResult(targetClientId, possibleDamageToTarget, clientId);
+		}
 		
 	}
 	
-	private class Edge
+	private class ActionResult
 	{
-		private final WarriorNode warriorA;
-		private final WarriorNode warriorB;
-		private List<WarriorNode> winners = new ArrayList<WarriorNode>(2);
-		
-		public Edge(WarriorNode warriorA, WarriorNode warriorB) {
-			this.warriorA = warriorA;
-			this.warriorB = warriorB;
-			calculateCombatResult();
-		}
-		
-		public List<WarriorNode> getWinners() {
-			return Collections.unmodifiableList(winners);			
-		}
-
-		private void calculateCombatResult() {
-			ActionStats aStats = warriorA.getStats();
-			ActionStats bStats = warriorB.getStats();
-			
-			boolean aAttackOK = false, 
-					bAttackOK = false;
-			
-			if(aStats.getAttackPower() > bStats.getDefensePower()) {
-				aAttackOK = true;
-			}
-			
-			if(bStats.getAttackPower() > aStats.getDefensePower()) {
-				bAttackOK = true;
-			}
-			
-			if(aAttackOK && bAttackOK) {
-				if(aStats.getAttackSpeed() >= bStats.getAttackSpeed()) {
-					winners.add(warriorA);
-				}
-				if(bStats.getAttackSpeed() >= aStats.getAttackSpeed()) {
-					winners.add(warriorB);
-				}
-			} else if(aAttackOK) {
-				winners.add(warriorA);
-			} else if(bAttackOK){
-				winners.add(warriorB);
-			} else {
-				throw new RuntimeException("Logic Error");
-			}
-			
-			int healthLost;
-			if(winners.contains(warriorA)) {
-				healthLost = aStats.getAttackPower() - bStats.getDefensePower();
-				warriorB.setHealthLost(warriorB.getHealthLost() + healthLost);
-				warriorB.addHealthLostFrom(warriorA.getClientId(), healthLost);
-			}
-			if(winners.contains(warriorB)) {
-				healthLost = bStats.getAttackPower() - aStats.getDefensePower();
-				warriorA.setHealthLost(warriorA.getHealthLost() + healthLost);
-				warriorA.addHealthLostFrom(warriorB.getClientId(), healthLost);
-			}
-		}
-		
-		public boolean nodeInEdge(WarriorNode node) {
-			return node.getClientId() == warriorA.getClientId() || node.getClientId() == warriorB.getClientId();
-		}
-
-	}
-	
-	private class WarriorNode
-	{
-		private HashSet<Edge> combats = new HashSet<Edge>();
 		private final int clientId;
-		private final int targetClientId;
-		private ActionStats stats;
-		private final Weapon weaponUsed; 
-		private final Action actionUsed;
-		private int healthLost = -1;
-		private HashMap<Integer, Integer> healthLostFrom = new HashMap<Integer, Integer>();
+		private final int healthLost;
+		private final int attackerClientId;
 		
-		public WarriorNode(int clientId, int targetClientId, ActionStats stats, Weapon weaponUsed, Action actionUsed) {
+		private ActionResult(int clientId, int healthLost, int attackerClientId) {
 			this.clientId = clientId;
-			this.targetClientId = targetClientId;
-			this.stats = stats;
-			this.weaponUsed = weaponUsed;
-			this.actionUsed = actionUsed;
+			this.healthLost = healthLost;
+			this.attackerClientId = attackerClientId;
 		}
 
-		public void addHealthLostFrom(int fromClientId, int givenHealthLost) {
-			healthLostFrom.put(fromClientId, givenHealthLost);
-		}
-
-		public int getTargetClientId() {
-			return targetClientId;
-		}
-
-		public Weapon getWeaponUsed() {
-			return weaponUsed;
-		}
-
-		public Action getActionUsed() {
-			return actionUsed;
-		}
-
-		public void addCombatEdge(Edge edge) {
-			for(Edge edge2 : combats) {
-				if(edge2.nodeInEdge(edge.warriorA) && edge2.nodeInEdge(edge.warriorB)) {
-					return;
-				}
-			}
-			
-			combats.add(edge);
-		}
-
-		public HashSet<Edge> getCombats() {
-			return combats;
-		}
-		
 		public int getClientId() {
 			return clientId;
 		}
 		
-		public ActionStats getStats() {
-			return stats;
-		}
-
-		public int getHealthLost() {
-			return healthLost;
-		}
-
-		public void setHealthLost(int healthLost) {
-			this.healthLost = healthLost;
+		public int getAttackerClientId() {
+			return attackerClientId;
 		}
 		
-		public HashMap<Integer, Integer> getHealthLostFrom() {
-			return healthLostFrom;
+		public int getHealthLost(){ 
+			return healthLost;
 		}
 	}
 }

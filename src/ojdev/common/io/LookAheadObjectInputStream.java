@@ -16,7 +16,9 @@ import ojdev.common.ConnectedClientState;
 import ojdev.common.SelectedAction;
 import ojdev.common.WarriorCombatResult;
 import ojdev.common.actions.Action;
+import ojdev.common.actions.ActionDamageType;
 import ojdev.common.actions.ActionDirection;
+import ojdev.common.actions.ActionStance;
 import ojdev.common.messages.AgnosticMessage;
 import ojdev.common.messages.AllowedMessageContext;
 import ojdev.common.messages.InvalidMessage;
@@ -44,6 +46,7 @@ import ojdev.common.messages.server.ServerTextMessage;
 import ojdev.common.messages.server.SetClientIdMessage;
 import ojdev.common.warriors.WarriorBase;
 import ojdev.common.weapons.Weapon;
+import ojdev.common.weapons.WeaponDamageType;
 
 /**
  * Checks the class's type to ensure it is of an allowed type before deserialization.
@@ -93,6 +96,9 @@ public class LookAheadObjectInputStream extends ObjectInputStream
 		
 		// Non Messages
 		tempAllowedTypeList.add(ActionDirection.class);
+		tempAllowedTypeList.add(ActionStance.class);
+		tempAllowedTypeList.add(ActionDamageType.class);
+		tempAllowedTypeList.add(WeaponDamageType.class);
 		tempAllowedTypeList.add(SelectedAction.class);
 		tempAllowedTypeList.add(ConnectedClientState.class);
 		tempAllowedTypeList.add(AllowedMessageContext.class);

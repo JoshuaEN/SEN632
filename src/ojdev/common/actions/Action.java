@@ -11,6 +11,10 @@ public class Action implements Serializable {
 	private final String description;
 
 	private final ActionDirection direction;
+
+	private final ActionStance stance;
+	
+	private final ActionDamageType damageType;
 	
 	private final int attackPowerModifier;
 
@@ -22,55 +26,57 @@ public class Action implements Serializable {
 	
 	private final boolean endsEngagement;
 	
-	public Action(String name, String description, ActionDirection direction, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier, boolean generic, boolean endsEngagement) {
+	public Action(String name, String description, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier, boolean generic, boolean endsEngagement) {
 		this.name = name;
 		this.description = description;
 		this.direction = direction;
+		this.stance = stance;
 		this.attackSpeedModifier = attackSpeedModifier;
 		this.attackPowerModifier = attackPowerModifier;
 		this.defensePowerModifier = defensePowerModifier;
+		this.damageType = damageType;
 		this.generic = generic;
 		this.endsEngagement = endsEngagement;
 	}
 	
-	public Action(String name, String description, ActionDirection direction, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier, boolean generic) {
-		this(name, description, direction, attackPowerModifier, attackPowerModifier, defensePowerModifier, generic, false);
+	public Action(String name, String description, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier, boolean generic) {
+		this(name, description, direction, stance, damageType, attackPowerModifier, attackPowerModifier, defensePowerModifier, generic, false);
 	}
 	
-	public Action(String name, ActionDirection direction, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier, boolean generic) {
-		this(name, "", direction, attackPowerModifier, attackPowerModifier, defensePowerModifier, generic, false);
+	public Action(String name, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier, boolean generic) {
+		this(name, "", direction, stance, damageType, attackPowerModifier, attackPowerModifier, defensePowerModifier, generic, false);
 	} 
 	
-	public Action(String name, String description, ActionDirection direction, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier) {
-		this(name, description, direction, attackPowerModifier, attackPowerModifier, defensePowerModifier, false, false);
+	public Action(String name, String description, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier) {
+		this(name, description, direction, stance, damageType, attackPowerModifier, attackPowerModifier, defensePowerModifier, false, false);
 	}
 	
-	public Action(String name, ActionDirection direction, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier) {
-		this(name, "", direction, attackPowerModifier, attackPowerModifier, defensePowerModifier, false, false);
+	public Action(String name, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int attackSpeedModifier, int attackPowerModifier, int defensePowerModifier) {
+		this(name, "", direction, stance, damageType, attackPowerModifier, attackPowerModifier, defensePowerModifier, false, false);
 	}
 	
-	public Action(String name, String description, ActionDirection direction, int attackSpeedModifier, int attackPowerModifier) {
-		this(name, description, direction, attackSpeedModifier, attackPowerModifier, 0);
+	public Action(String name, String description, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int attackSpeedModifier, int attackPowerModifier) {
+		this(name, description, direction, stance, damageType, attackSpeedModifier, attackPowerModifier, 0);
 	}
 	
-	public Action(String name, ActionDirection direction, int attackSpeedModifier, int attackPowerModifier) {
-		this(name, "", direction, attackSpeedModifier, attackPowerModifier, 0);
+	public Action(String name, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int attackSpeedModifier, int attackPowerModifier) {
+		this(name, "", direction, stance, damageType, attackSpeedModifier, attackPowerModifier, 0);
 	}
 	
-	public Action(String name, String description, ActionDirection direction, int defensePowerModifier) {
-		this(name, description, direction, 0, 0, defensePowerModifier);
+	public Action(String name, String description, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int defensePowerModifier) {
+		this(name, description, direction, stance, damageType, 0, 0, defensePowerModifier);
 	}
 	
-	public Action(String name, ActionDirection direction, int defensePowerModifier) {
-		this(name, "", direction, 0, 0, defensePowerModifier);
+	public Action(String name, ActionDirection direction, ActionStance stance, ActionDamageType damageType, int defensePowerModifier) {
+		this(name, "", direction, stance, damageType, 0, 0, defensePowerModifier);
 	}
 	
-	public Action(String name, String description, ActionDirection direction) {
-		this(name, description, direction, 0, 0, 0);
+	public Action(String name, String description, ActionDirection direction, ActionStance stance, ActionDamageType damageType) {
+		this(name, description, direction, stance, damageType, 0, 0, 0);
 	}
 	
-	public Action(String name, ActionDirection direction) {
-		this(name, "", direction, 0, 0, 0);
+	public Action(String name, ActionDirection direction, ActionStance stance, ActionDamageType damageType) {
+		this(name, "", direction, stance, damageType, 0, 0, 0);
 	}
 
 	public String getName() {
@@ -83,6 +89,14 @@ public class Action implements Serializable {
 	
 	public ActionDirection getDirection() {
 		return direction;
+	}
+	
+	public ActionStance getStance() {
+		return stance;
+	}
+	
+	public ActionDamageType getDamageType() {
+		return damageType;
 	}
 	
 	public int getAttackPowerModifier() {

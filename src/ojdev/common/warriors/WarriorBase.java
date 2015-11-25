@@ -12,7 +12,9 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 
 import ojdev.common.Armory;
+import ojdev.common.actions.Action;
 import ojdev.common.weapons.Weapon;
+import ojdev.common.weapons.WeaponDamageType;
 
 /**
  * Base Abstract class for Warrior Types
@@ -79,11 +81,11 @@ public abstract class WarriorBase implements java.io.Serializable {
 	 * @param autoAdjust determines if illegal health values (h < 0 or h > 100) should be automatically adjusted to be legal
 	 */
 	public void setHealth(int health, boolean autoAdjust) {
-		if(health > 100) {
+		if(health > getMaxHealth()) {
 			if(autoAdjust) {
-				health = 100;
+				health = getMaxHealth();
 			} else {
-				throw new IllegalArgumentException("Health can't be over 100");
+				throw new IllegalArgumentException("Health can't be over " + getMaxHealth());
 			}
 		} else if(health < 0) {
 			if(autoAdjust) {
@@ -93,6 +95,10 @@ public abstract class WarriorBase implements java.io.Serializable {
 			}
 		}
 		this.health = health;
+	}
+	
+	public int getMaxHealth() {
+		return 100;
 	}
 	
 	public Weapon getEquippedWeapon() {
@@ -115,6 +121,19 @@ public abstract class WarriorBase implements java.io.Serializable {
 		return String.format("%s.%s", name, getFileExtension());
 	}
 	
+	public int getDamageDone(Weapon attackersWeapon, Action attackersAction, Action ourAction) {
+		if(attackersWeapon.getDamageTypeForAction(attackersAction) == WeaponDamageType.NONE) {
+			return 0;
+		}
+		int interm = attackersWeapon.getEffectiveAttackPower(attackersAction) /
+				(getEquippedWeapon().getEffectiveDefensePower(ourAction) / 5);
+		
+		if(interm < 0) {
+			return 0;
+		}
+		return interm;
+	}
+	
 	public boolean canUseWeapon(Weapon weapon) {
 		return Armory.NO_WEAPON == weapon || getUsableWeapons().contains(weapon);
 	}
@@ -124,6 +143,19 @@ public abstract class WarriorBase implements java.io.Serializable {
 	}
 
 	public abstract String getFileExtension();
+	
+	/**
+	 * If damage received exceeds this, then the Warrior's attack
+	 * will fail. 
+	 * @return pain threshold
+	 */
+	public int getPainThreshold() {
+		return getHealth() / 10;
+	}
+	
+	public boolean isOverPainThreshold(int damage) {
+		return damage > getPainThreshold();
+	}
 	
 	public abstract List<Weapon> getUsableWeapons();
 	
