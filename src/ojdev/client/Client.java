@@ -272,7 +272,7 @@ public class Client implements Runnable, ServerMessageHandler {
 
 	@Override
 	public void handleEngagementCombatResultMessage(EngagementCombatResultMessage message) {
-		// NOOP
+		clearEngagementCurrentlySelectedActions();
 	}
 
 	@Override
@@ -311,6 +311,6 @@ public class Client implements Runnable, ServerMessageHandler {
 
 	@Override
 	public void handleRelayedTextToAllMessage(RelayedTextToAllMessage message) {
-		clearEngagementCurrentlySelectedActions();
+		// NOOP
 	}
 }
