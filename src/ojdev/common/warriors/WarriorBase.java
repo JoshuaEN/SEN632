@@ -2,7 +2,7 @@ package ojdev.common.warriors;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.util.AbstractMap;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -237,39 +237,21 @@ public abstract class WarriorBase implements java.io.Serializable {
 		writer.flush();
 	}
 	
-	protected final void writeValueToOutputStream(Formatter writer, String key, Object value) {
+	public static final void writeValueToOutputStream(Formatter writer, String key, Object value) {
 		writer.format(" %s=%s%n", key, value);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	public final static WarriorBase readFromOutputStream(InputStream inputStream) 
 			throws 
 				ClassNotFoundException, 
 				UnusableWeaponException,
 				InvocationTargetException
 		{
+		// This isn't closed HERE, the underlying inputStream is closed elsewhere.
 		Scanner reader = new Scanner(inputStream);
 		
-		Map<String, String> input = new HashMap<String, String>();
-		
-		while(reader.hasNext()) {
-			String next = reader.nextLine();
-			
-			// Ignore blank lines and comment lines
-			if(next.startsWith("#") || next.trim().isEmpty()) {
-				continue;
-			}
-			
-			int splitIdx = next.indexOf('=');
-			
-			if(splitIdx < 0) {
-				throw new IllegalArgumentException("Invalid Input Line of: " + next);
-			}
-			
-			String name = next.substring(0, splitIdx).trim();
-			String value = next.substring(splitIdx+1).trim();
-			input.put(name, value);
-		}
+		Map<String, String> input = readInputFromOutputStream(reader);
 		
 		if(input.containsKey("type") == false) {
 			throw new IllegalArgumentException("type must be given");
@@ -291,6 +273,37 @@ public abstract class WarriorBase implements java.io.Serializable {
 			throw new UnsupportedOperationException("Type does not support loading from text file", e);
 		}
 	}
+	
+	public final static Map<String, String> readInputFromOutputStream(Scanner reader) {
+		Map<String, String> input = new HashMap<String, String>();
+		
+		while(reader.hasNext()) {
+			String next = reader.nextLine();
+			
+			Entry<String, String> result = parseLineFromOutputStream(next);
+			input.put(result.getKey(), result.getValue());
+		}
+		return input;
+	}
+	
+	public final static Entry<String, String> parseLineFromOutputStream(String next) {
+		// Ignore blank lines and comment lines
+		if(next.startsWith("#") || next.trim().isEmpty()) {
+			return null;
+		}
+
+		int splitIdx = next.indexOf('=');
+
+		if(splitIdx < 0) {
+			throw new IllegalArgumentException("Invalid Input Line of: " + next);
+		}
+
+		String name = next.substring(0, splitIdx).trim();
+		String value = next.substring(splitIdx+1).trim();
+		
+		return new AbstractMap.SimpleEntry<String, String>(name, value);
+	}
+	
 
 	/*
 	 * Parsers for converting from Text. If Java didn't require the call to the
