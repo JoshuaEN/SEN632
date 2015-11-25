@@ -22,6 +22,8 @@ import ojdev.common.weapons.WeaponDamageType;
 public abstract class WarriorBase implements java.io.Serializable {
 
 	private static final long serialVersionUID = 2513148787247654417L;
+	
+	public static final String NAME_REGEX = "^[\\w]+$";
 
 	private final String name;
 
@@ -38,6 +40,9 @@ public abstract class WarriorBase implements java.io.Serializable {
 	}
 	
 	public WarriorBase(String name, String originLocation, String description, int health, Weapon equippedWeapon) throws UnusableWeaponException {
+		if(name.matches(NAME_REGEX) == false) {
+			throw new IllegalArgumentException("Name can only contain characters A to Z, 0 to 9, and _; it also can't be blank");
+		}
 		this.name = name;
 		this.originLocation = originLocation;
 		this.description = description;
