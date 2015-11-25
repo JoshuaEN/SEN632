@@ -136,8 +136,7 @@ public abstract class WarriorBase implements java.io.Serializable {
 		if(attackersWeapon.getDamageTypeForAction(attackersAction) == WeaponDamageType.NONE) {
 			return 0;
 		}
-		int interm = attackersWeapon.getEffectiveAttackPower(attackersAction) /
-				(getEquippedWeapon().getEffectiveDefensePower(ourAction) / 5);
+		int interm = attackersWeapon.getEffectiveAttackPower(attackersAction);
 		
 		if(interm < 0) {
 			return 0;

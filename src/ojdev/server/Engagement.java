@@ -457,25 +457,38 @@ public class Engagement {
 						targetsAction.getDirection() == ActionDirection.None)
 				{
 
-					// Attack blocked successfully
-					if(
-							(
-									targetsAction.getStance() == ActionStance.DEFENSE_BLOCK ||
-									targetsAction.getStance() == ActionStance.DEFENSE_COUNTER
-									) && getAttackPower() < target.getDefensePower()
-							) {
+					// Defender is blocking
+					if(targetsAction.getStance() == ActionStance.DEFENSE_BLOCK ||
+						targetsAction.getStance() == ActionStance.DEFENSE_COUNTER) {
 
-						// No counter attack
-						if(targetsAction.getStance() == ActionStance.DEFENSE_BLOCK) {
-							return null;
-
-							// Counter attacked
+						// Attack fails
+						if(getAttackPower() < target.getDefensePower()) {
+						
+							// No counter attack
+							if(targetsAction.getStance() == ActionStance.DEFENSE_BLOCK) {
+								return null;
+	
+								// Counter attacked
+							} else {
+								return new ActionResult(clientId, possibleDamageFromTargetCounter, targetClientId);
+							}
+							
+						// They will have reduced the damage taken then
 						} else {
-							return new ActionResult(clientId, possibleDamageFromTargetCounter, targetClientId);
+							int defensePower = target.getDefensePower();
+							defensePower = defensePower / (int)Math.pow(1.2, getAttackPower()-getDefensePower());
+							
+							if(defensePower > 0) {
+								possibleDamageFromTarget = possibleDamageFromTarget - (possibleDamageFromTarget / defensePower);
+							}
+							
+							if(possibleDamageToTarget < 0) {
+								possibleDamageToTarget = 0;
+							}
 						}
 
-						// Attack blocked by both sides attacking the same side,
-						// and having less attack power
+					// Attack blocked by both sides attacking the same side,
+					// and having less attack power 
 					} else if (
 							target.getTargetClientId() == getClientId() &&
 							targetsAction.getStance() == ActionStance.ATTACK &&
