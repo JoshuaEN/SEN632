@@ -35,3 +35,6 @@ The network communication is done using Java Sockets via specific Message Class 
 ## Credits
 * Olumide Ahmed
 * Joshua Neuenhoff
+
+## Notes
+* The password for the included Crypto Warrior (showed as ??? 0dfd7feb in the Warriors list) is SEN632
