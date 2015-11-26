@@ -88,7 +88,7 @@ public class ChatWindow extends JFrame implements ChatAreaNotifyInterface {
 		String fromStr;
 		
 		if(state != null) {
-			fromStr = ClientFormatHelper.getMasterNameFromState(state, state.getClientId() == from);
+			fromStr = ClientFormatHelper.getMasterNameFromState(state, client.getClientId() == from);
 		} else {
 			fromStr = from.toString();
 		}
