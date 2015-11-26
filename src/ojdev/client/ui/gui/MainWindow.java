@@ -632,12 +632,6 @@ public class MainWindow
 		updateMasterListOptionState();
 		
 		if(message.getConnectedClientState().getClientId() == client.getClientId()) {
-			if(currentWarrior != null && 
-					client.getCurrentWarrior() != null && 
-					currentWarrior.getName().equals(client.getCurrentWarrior()) == false) {
-				chatAreaTournament.appendText("The Tournament Organizers welcome your %s, %s, to the field of battle %n", client.getCurrentWarrior().getTypeName(), client.getCurrentWarrior().getName());
-			}
-			
 			updateCurrentWarrior(client.getCurrentWarrior());
 		}
 		
@@ -1092,6 +1086,11 @@ public class MainWindow
 		if(client != null) {
 			try {
 				client.sendMessage(new SetWarriorMessage(this.currentWarrior));
+				if(currentWarrior != null && 
+						(client.getCurrentWarrior() == null || 
+						currentWarrior.getName().equals(client.getCurrentWarrior().getName()) == false)) {
+					chatAreaTournament.appendText("The Tournament Organizers welcome your %s, %s, to the field of battle %n", currentWarrior.getTypeName(), currentWarrior.getName());
+				}
 			} catch (IOException e) {
 				
 				disconnect();
